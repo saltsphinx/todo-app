@@ -1,0 +1,14 @@
+{
+  "type": "module",
+  "dependencies": {
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^12.1.0",
+    "rollup": "^4.22.4",
+    "tslib": "^2.7.0"
+  },
+  "scripts": {
+    "start": "rollup -c --watch"
+  }
+}
