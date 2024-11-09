@@ -1,5 +1,6 @@
 import sqlite3 from "sqlite3";
 import express from "express";
+import cors from "cors";
 
 const db = new (sqlite3.verbose()).Database("./data.sqlite3");
 const app = express();
@@ -24,6 +25,7 @@ db.serialize(() => {
     });
 });
 
+app.use(cors());
 app.use(express.json());
 
 app.get("/todos", (req, res) => {
@@ -51,6 +53,8 @@ app.post("/todos", (req, res) => {
 app.put("/todos/:id", (req, res) => {
     const { id } = req.params;
     const { description, is_complete } = req.body;
+    console.log(req.body);
+    
 
     db.run("UPDATE todo SET description = ?, is_complete = ? WHERE id = ?;", description, is_complete, id, function(err) {
         if (err) {
