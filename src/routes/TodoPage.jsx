@@ -39,6 +39,20 @@ export default function TodoPage() {
     fetchTodos();
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    await fetch("http://localhost:3040/todos", {
+      method: "POST",
+      body: JSON.stringify(Object.fromEntries(formData)),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    fetchTodos();
+  };
+
   useEffect(() => {
     const getData = async () => {
       try {
@@ -63,6 +77,14 @@ export default function TodoPage() {
 
   return (
     <section>
+      <form onSubmit={handleSubmit}>
+        <input
+          name="description"
+          type="text"
+          placeholder="add description..."
+        />
+        <button type="submit">ADD</button>
+      </form>
       {todos.map((todo) => (
         <TodoComponent
           key={todo.id}
