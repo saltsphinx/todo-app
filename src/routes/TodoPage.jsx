@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Todo from "../components/Todo.jsx";
 
 export default function TodoPage() {
   const [todos, setTodos] = useState();
@@ -77,74 +78,28 @@ export default function TodoPage() {
 
   return (
     <section>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="mb-2">
         <input
           name="description"
           type="text"
           placeholder="add description..."
+          className="mb-2"
         />
-        <button type="submit">ADD</button>
+        <button className="btn btn-primary d-block" type="submit">
+          ADD
+        </button>
       </form>
-      {todos.map((todo) => (
-        <TodoComponent
-          key={todo.id}
-          {...todo}
-          todo={todo}
-          handleDelete={handleDelete}
-          handleUpdate={handleUpdate}
-        />
-      ))}
+      <div className="bg-secondary bg-gradient bg-opacity-25 p-2 rounded-2">
+        {todos.map((todo) => (
+          <Todo
+            key={todo.id}
+            {...todo}
+            todo={todo}
+            handleDelete={handleDelete}
+            handleUpdate={handleUpdate}
+          />
+        ))}
+      </div>
     </section>
-  );
-}
-
-function TodoComponent({
-  id,
-  description,
-  is_complete,
-  todo,
-  handleDelete,
-  handleUpdate,
-}) {
-  const [isEdit, setIsEdit] = useState(false);
-  const [input, setInput] = useState(description);
-
-  const handleEdit = () => {
-    handleUpdate({ ...todo, description: input });
-    setIsEdit(!isEdit);
-  };
-
-  return (
-    <div className="todo">
-      <input
-        onClick={() => {
-          handleUpdate({ ...todo, is_complete: !is_complete });
-        }}
-        type="checkbox"
-        readOnly
-        checked={Boolean(is_complete)}
-      />
-      {isEdit ? (
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-        />
-      ) : (
-        <p>{description}</p>
-      )}
-      <input onClick={() => handleDelete(id)} type="button" value="Delete" />
-      {isEdit ? (
-        <input type="button" value="save" onClick={handleEdit} />
-      ) : (
-        <input
-          type="button"
-          value="edit"
-          onClick={() => {
-            setIsEdit(!isEdit);
-          }}
-        />
-      )}
-    </div>
   );
 }

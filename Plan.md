@@ -10,6 +10,10 @@ We'll start with the todo functionality and add the login/signup later since I u
 Next, we'll build the todo page based on the wireframe I created. React Router will still be used even though currently theres only a single page.
 - Create the end points. GET /todos, POST /todos, UPDATE /todos, DELETE /todos
 
+I completed the basic funcionality of both the front and backend. Now what's left is styling with Bootstrap and adding user funcionality. I might also add timestamps to todo's, and sort by that.
+
+Completed styling, now onto learning about user authentication, sessions, and implementing the login/signup pages, endpoints and user and I'm assuming sessions table 
+
 Root
 ├ Header
 └ Todo View
