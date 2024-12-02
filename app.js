@@ -1,12 +1,38 @@
 import express from "express";
+import session from "express-session";
 import cors from "cors";
+import passport from "./config/passport.js";
+import knex from "./config/db.js";
+import { ConnectSessionKnexStore } from "connect-session-knex";
+import dotenv from "dotenv";
 
+// Setup
+dotenv.config();
 const app = express();
+const knexStore = new ConnectSessionKnexStore({
+  knex: knex,
+  createTable: true,
+});
 
 app.use(cors());
 app.use(express.json());
 
-app.get("/todos", (req, res) => {
+// Express-session
+app.use(
+  session({
+    secret: process.env.SECRET || "cat_hair_ball",
+    cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 }, // days * hours * minutes * seconds * milliseconds
+    saveUninitialized: false,
+    resave: false,
+    store: knexStore,
+  })
+);
+
+// Passport
+app.use(passport.session());
+
+// Endpoints
+app.get("/todos", async (req, res) => {
   // db.all(
   //   "SELECT * FROM todo WHERE is_complete = FALSE UNION ALL SELECT * FROM todo WHERE is_complete = TRUE;",
   //   (err, rows) => {
@@ -16,6 +42,13 @@ app.get("/todos", (req, res) => {
   //     res.json(rows);
   //   }
   // );
+
+  try {
+    const todos = await knex.from("todo");
+    res.json(todos);
+  } catch (err) {
+    return res.status(500).json({ err });
+  }
 });
 
 app.post("/todos", (req, res) => {
@@ -64,6 +97,13 @@ app.delete("/todos/:id", (req, res) => {
 
   //   res.status(204).end();
   // });
+});
+
+app.post("/session", (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) next(err);
+    // IMPLEMENT LOGIN FUNCTIONALITY
+  })(req, res, next);
 });
 
 app.listen(3040);

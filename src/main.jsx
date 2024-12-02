@@ -1,10 +1,10 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Root from "./routes/Root";
-import Login from "./routes/Login";
-import Signup from "./routes/Signup";
-import TodoPage from "./routes/TodoPage";
+import Root from "./views/Root";
+import Login from "./views/Login";
+import Signup from "./views/Signup";
+import TodoPage from "./views/TodoPage";
 
 const router = createBrowserRouter([
   {
@@ -17,12 +17,12 @@ const router = createBrowserRouter([
       },
       {
         path: "/login",
-        element: <Login />
+        element: <Login />,
       },
       {
         path: "/signup",
-        element: <Signup />
-      }
+        element: <Signup />,
+      },
     ],
   },
 ]);
