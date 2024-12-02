@@ -1,6 +1,6 @@
 import pp from "passport";
 import LocalStrategy from "passport-local";
-import knex from "./db";
+import knex from "./db.js";
 import bcrypt from "bcryptjs";
 
 const passport = new pp.Passport();
