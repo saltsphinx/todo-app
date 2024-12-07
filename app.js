@@ -5,6 +5,7 @@ import passport from "./config/passport.js";
 import knex from "./config/db.js";
 import { ConnectSessionKnexStore } from "connect-session-knex";
 import dotenv from "dotenv";
+import { redirect } from "react-router-dom";
 
 // Setup
 dotenv.config();
@@ -17,10 +18,15 @@ const knexStore = new ConnectSessionKnexStore({
 app.use(cors());
 app.use(express.json());
 
+function isAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) return next();
+  res.status(401).json({ redirect: "/login" });
+}
+
 // Express-session
 app.use(
   session({
-    secret: process.env.SECRET || "cat_hair_ball",
+    secret: process.env.SECRET,
     cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 }, // days * hours * minutes * seconds * milliseconds
     saveUninitialized: false,
     resave: false,
@@ -32,7 +38,7 @@ app.use(
 app.use(passport.session());
 
 // Endpoints
-app.get("/todos", async (req, res) => {
+app.get("/todos", isAuthenticated, async (req, res) => {
   // db.all(
   //   "SELECT * FROM todo WHERE is_complete = FALSE UNION ALL SELECT * FROM todo WHERE is_complete = TRUE;",
   //   (err, rows) => {
@@ -51,9 +57,15 @@ app.get("/todos", async (req, res) => {
   }
 });
 
-app.post("/todos", (req, res) => {
+app.post("/todos", async (req, res) => {
   const { description, is_complete } = req.body;
 
+  try {
+    const result = await knex.insert({ description, is_complete: is_complete || false, user_id: 1 }).into("todo");  
+    res.json({ lastID: result });
+  } catch (err) {
+    res.status(500).json({ err });
+  }
   // db.run(
   //   "INSERT INTO todo (description, is_complete) VALUES (?, ?);",
   //   description,
@@ -100,10 +112,16 @@ app.delete("/todos/:id", (req, res) => {
 });
 
 app.post("/session", (req, res, next) => {
-  passport.authenticate("local", (err, user, info) => {
-    if (err) next(err);
+  
+  passport.authenticate("local", (err, user, info) => {    
+    if (err) return next(err);
+    if (!user) return res.status(401).json({ redirect: "/login", info });
     // IMPLEMENT LOGIN FUNCTIONALITY
+    
+    req.logIn(user, next);
   })(req, res, next);
+}, (req, res) => {
+  res.json({ redirect: "/login" });
 });
 
 app.listen(3040);

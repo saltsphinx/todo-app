@@ -1,4 +1,5 @@
 import k from "knex";
+import bcrypt from "bcryptjs"
 
 const knex = k({
   client: "sqlite3",
@@ -26,7 +27,7 @@ async function setup() {
 
   if (!(await knex("user").first()) && !(await knex("todo").first())) {
     await knex
-      .insert({ username: "Bytebugs", password: "abcd123!" })
+      .insert({ username: "Bytebugs", password: await bcrypt.hash("abcd123!", 10) })
       .into("user");
     await knex
       .insert({
@@ -35,7 +36,7 @@ async function setup() {
         is_complete: false,
       })
       .into("todo");
-  }
+  }  
 }
 
 async function createTable(tableName, cb) {

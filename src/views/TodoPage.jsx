@@ -5,6 +5,7 @@ export default function TodoPage() {
   const [todos, setTodos] = useState();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const fetchTodos = async () => {
     const data = await fetch("http://localhost:3040/todos");
@@ -13,6 +14,8 @@ export default function TodoPage() {
     }
 
     const json = await data.json();
+
+    
     setTodos(json);
   };
 

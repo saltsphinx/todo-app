@@ -9,15 +9,16 @@ passport.use(
   new LocalStrategy(async (username, password, done) => {
     try {
       const user = await knex.from("user").where("username", username).first();
+      
       if (!user) {
-        done(null, false, {
+        return done(null, false, {
           message: "Username or password entered were incorrect.",
         });
       }
-
-      const match = await bcrypt.compare(user.password, password);
+      
+      const match = await bcrypt.compare(password, user.password);
       if (!match) {
-        done(null, false, {
+        return done(null, false, {
           message: "Username or password entered were incorrect.",
         });
       }
