@@ -7,6 +7,7 @@ export default function Login() {
 
     const result = await fetch("http://localhost:3040/session", {
       method: "POST",
+      credentials: "include",
       body: JSON.stringify(Object.fromEntries(formData)),
       headers: {
         "Content-Type": "application/json",

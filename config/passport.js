@@ -8,14 +8,17 @@ const passport = new pp.Passport();
 passport.use(
   new LocalStrategy(async (username, password, done) => {
     try {
-      const user = await knex.from("user").where("username", username).first();
-      
+      const user = await knex
+        .from("user")
+        .where("username", username.toLowerCase())
+        .first();
+
       if (!user) {
         return done(null, false, {
           message: "Username or password entered were incorrect.",
         });
       }
-      
+
       const match = await bcrypt.compare(password, user.password);
       if (!match) {
         return done(null, false, {

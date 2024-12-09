@@ -15,7 +15,12 @@ const knexStore = new ConnectSessionKnexStore({
   createTable: true,
 });
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 function isAuthenticated(req, res, next) {
@@ -27,7 +32,7 @@ function isAuthenticated(req, res, next) {
 app.use(
   session({
     secret: process.env.SECRET,
-    cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 }, // days * hours * minutes * seconds * milliseconds
+    cookie: { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true }, // days * hours * minutes * seconds * milliseconds
     saveUninitialized: false,
     resave: false,
     store: knexStore,
@@ -61,7 +66,9 @@ app.post("/todos", async (req, res) => {
   const { description, is_complete } = req.body;
 
   try {
-    const result = await knex.insert({ description, is_complete: is_complete || false, user_id: 1 }).into("todo");  
+    const result = await knex
+      .insert({ description, is_complete: is_complete || false, user_id: 1 })
+      .into("todo");
     res.json({ lastID: result });
   } catch (err) {
     res.status(500).json({ err });
@@ -111,17 +118,20 @@ app.delete("/todos/:id", (req, res) => {
   // });
 });
 
-app.post("/session", (req, res, next) => {
-  
-  passport.authenticate("local", (err, user, info) => {    
-    if (err) return next(err);
-    if (!user) return res.status(401).json({ redirect: "/login", info });
-    // IMPLEMENT LOGIN FUNCTIONALITY
-    
-    req.logIn(user, next);
-  })(req, res, next);
-}, (req, res) => {
-  res.json({ redirect: "/login" });
-});
+app.post(
+  "/session",
+  (req, res, next) => {
+    passport.authenticate("local", (err, user, info) => {
+      if (err) return next(err);
+      if (!user) return res.status(401).json({ redirect: "/login", info });
+      // IMPLEMENT LOGIN FUNCTIONALITY
+
+      req.logIn(user, next);
+    })(req, res, next);
+  },
+  (req, res) => {
+    res.json({ redirect: "/login" });
+  }
+);
 
 app.listen(3040);
